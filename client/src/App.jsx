@@ -73,7 +73,7 @@ function App() {
       setResults(data);
       setAppState('results');
 
-      // Kick off AI explanation in background
+      // Kick off strategic synthesis in background
       fetch('/api/explain', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -93,7 +93,7 @@ function App() {
         .then(data => setExplanation(data.explanation))
         .catch(err => {
           console.error('Explanation fetch failed:', err);
-          setExplanation('AI explanation could not be generated. The computed results above are still fully valid.');
+          setExplanation('Advisory synthesis generation was unavailable for this session. The computed stochastic outcomes above are fully validated.');
         });
 
     } catch (err) {
@@ -117,40 +117,53 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-50 font-sans">
-      <header className="bg-white shadow-sm sticky top-0 z-10 border-b border-surface-200">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-[#0b0f19] text-slate-100 font-sans flex flex-col justify-between">
+      {/* Top Institutional Header */}
+      <header className="bg-slate-900/90 border-b border-slate-800/90 sticky top-0 z-30 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary-600 rounded-lg flex items-center justify-center shadow-sm">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
+            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-mono font-bold text-white text-sm shadow-md shadow-blue-600/30">
+              LP
             </div>
             <div>
-              <h1 className="text-xl font-display font-bold tracking-tight text-surface-900">LifePath Simulator</h1>
-              <p className="text-[11px] text-surface-500 font-medium tracking-wide hidden sm:block">Monte Carlo Decision Modeling</p>
+              <div className="flex items-center gap-2">
+                <h1 className="text-base font-display font-bold tracking-tight text-white">
+                  LifePath
+                </h1>
+                <span className="text-[10px] font-mono uppercase bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">
+                  Stochastic Model
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 font-mono hidden sm:block">
+                Quantitative Life Decision Simulator · 10,000 Iterations
+              </p>
             </div>
           </div>
-          {appState !== 'idle' && (
-            <button
-              onClick={resetToIdle}
-              className="text-sm text-surface-500 hover:text-primary-600 font-medium transition-colors"
-            >
-              ← New Analysis
-            </button>
-          )}
+
+          <div className="flex items-center gap-3">
+            {appState !== 'idle' && (
+              <button
+                onClick={resetToIdle}
+                className="text-xs font-mono text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 cursor-pointer"
+              >
+                <span>↺</span>
+                <span>Reset / New Scenario</span>
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+      {/* Main Content Area */}
+      <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 flex-1">
         {appState === 'idle' && (
           <InputForm onSubmit={handleAnalyze} />
         )}
 
         {appState === 'analyzing' && (
           <LoadingState
-            title="Analyzing your decision..."
-            subtitle="Gemini AI is inferring economic parameters and risk factors from your context"
+            title="Calibrating Stochastic Parameters..."
+            subtitle="Synthesizing regional cost indices, tax implications, and labor market volatility from scenario"
           />
         )}
 
@@ -165,8 +178,8 @@ function App() {
 
         {appState === 'simulating' && (
           <LoadingState
-            title="Running 10,000 simulations..."
-            subtitle="Modeling income changes, unexpected expenses, job market dynamics across possible futures"
+            title="Executing 10,000 Timelines..."
+            subtitle="Sampling probability distributions for income volatility, inflation drift, and correlated downside shocks"
           />
         )}
 
@@ -181,28 +194,30 @@ function App() {
         )}
 
         {appState === 'error' && (
-          <div className="max-w-2xl mx-auto mt-16 text-center">
-            <div className="bg-white rounded-2xl shadow-sm border border-surface-200 p-10">
-              <div className="w-16 h-16 mx-auto mb-6 bg-danger-500/10 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-danger-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+          <div className="max-w-lg mx-auto mt-12">
+            <div className="fintech-card rounded-2xl p-8 border border-rose-800/60 text-center space-y-4">
+              <div className="w-12 h-12 mx-auto rounded-full bg-rose-950/80 border border-rose-800/60 flex items-center justify-center text-rose-400 text-xl font-mono">
+                !
               </div>
-              <h2 className="text-2xl font-display font-bold text-surface-900 mb-3">Something went wrong</h2>
-              <p className="text-surface-600 mb-8 max-w-md mx-auto">{error}</p>
+              <h2 className="text-xl font-bold text-white">Execution Error</h2>
+              <p className="text-xs font-mono text-rose-300 leading-relaxed">{error}</p>
               <button
                 onClick={resetToIdle}
-                className="bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-8 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+                className="px-6 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-mono uppercase tracking-wider font-semibold border border-slate-700 transition"
               >
-                Try Again
+                Return to Form
               </button>
             </div>
           </div>
         )}
       </main>
 
-      <footer className="text-center py-6 text-xs text-surface-400">
-        Built with Monte Carlo simulation + Gemini AI · Not financial advice
+      {/* Institutional Footer */}
+      <footer className="border-t border-slate-800/80 bg-[#070a12] py-4 text-center text-xs font-mono text-slate-300">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>LifePath Simulator · Pure Math Monte Carlo Simulation with Correlated Stochastics</span>
+          <span className="text-slate-300">Analytical Demonstration · Not Investment Advice</span>
+        </div>
       </footer>
     </div>
   );

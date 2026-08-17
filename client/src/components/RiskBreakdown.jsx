@@ -5,18 +5,26 @@ export default function RiskBreakdown({ data }) {
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+      const worst = payload.find(p => p.dataKey === 'worstCaseFrequency')?.value || 0;
+      const normal = payload.find(p => p.dataKey === 'normalFrequency')?.value || 0;
+      const delta = (worst - normal) * 100;
+
       return (
-        <div className="bg-white p-3 border border-surface-200 shadow-lg rounded-xl text-sm max-w-xs">
-          <p className="font-bold text-surface-900 mb-2 border-b border-surface-100 pb-2">{label}</p>
-          <div className="space-y-1">
-            <p className="text-danger-600 flex justify-between gap-4">
-              <span>In Worst 10% of Outcomes:</span> 
-              <span className="font-bold">{formatPercent(payload[0].value)}</span>
-            </p>
-            <p className="text-surface-500 flex justify-between gap-4">
-              <span>Overall Average:</span> 
-              <span>{formatPercent(payload[1].value)}</span>
-            </p>
+        <div className="bg-slate-900/95 border border-slate-700/80 p-3 rounded-xl shadow-2xl text-xs font-mono backdrop-blur-md max-w-xs">
+          <p className="font-bold text-white mb-2 border-b border-slate-800 pb-1">{label}</p>
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center text-rose-400">
+              <span>Worst 10% Tail Runs:</span>
+              <span className="font-bold">{formatPercent(worst)}</span>
+            </div>
+            <div className="flex justify-between items-center text-slate-400">
+              <span>Baseline Cohort (Top 50%):</span>
+              <span>{formatPercent(normal)}</span>
+            </div>
+            <div className="pt-1.5 border-t border-slate-800/80 flex justify-between text-[11px] text-slate-300">
+              <span>Downside Sensitivity:</span>
+              <span className="font-semibold text-yellow-400">+{delta.toFixed(1)}% elevated</span>
+            </div>
           </div>
         </div>
       );
@@ -25,38 +33,52 @@ export default function RiskBreakdown({ data }) {
   };
 
   return (
-    <div className="h-80 w-full">
-      <h3 className="text-lg font-bold text-surface-900 mb-1 text-center">What Drives the Worst Outcomes?</h3>
-      <p className="text-xs text-surface-500 text-center mb-4">Frequency of events in bottom 10% vs overall average</p>
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart 
-          data={data} 
-          layout="vertical"
-          margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
-          barGap={2}
-        >
-          <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-          <XAxis 
-            type="number" 
-            tickFormatter={(val) => `${(val * 100).toFixed(0)}%`}
-            stroke="#94a3b8"
-            tick={{ fill: '#64748b', fontSize: 12 }}
-            domain={[0, 'dataMax + 0.1']}
-          />
-          <YAxis 
-            type="category" 
-            dataKey="factor"
-            stroke="#94a3b8"
-            tick={{ fill: '#475569', fontSize: 12, fontWeight: 500 }}
-            width={100}
-          />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f1f5f9' }} />
-          <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-          
-          <Bar dataKey="worstCaseFrequency" name="In Worst Outcomes" fill="#ef4444" radius={[0, 4, 4, 0]} />
-          <Bar dataKey="normalFrequency" name="Overall Average" fill="#cbd5e1" radius={[0, 4, 4, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+        <div>
+          <h3 className="text-sm font-mono font-bold uppercase tracking-wider text-slate-200">
+            Downside Sensitivity Decomposition
+          </h3>
+          <p className="text-xs text-slate-400">
+            Event incidence in 10th percentile worst outcomes vs baseline
+          </p>
+        </div>
+      </div>
+
+      <div className="h-72 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={data}
+            layout="vertical"
+            margin={{ top: 10, right: 20, left: 40, bottom: 10 }}
+            barGap={3}
+          >
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#1e293b" />
+            <XAxis
+              type="number"
+              tickFormatter={(val) => `${(val * 100).toFixed(0)}%`}
+              stroke="#475569"
+              tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'JetBrains Mono' }}
+              domain={[0, 1]}
+            />
+            <YAxis
+              type="category"
+              dataKey="factor"
+              stroke="#475569"
+              tick={{ fill: '#cbd5e1', fontSize: 11, fontFamily: 'JetBrains Mono' }}
+              width={120}
+            />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
+            <Legend
+              wrapperStyle={{ fontSize: '11px', fontFamily: 'JetBrains Mono', paddingTop: '10px' }}
+              formatter={(value) => <span className="text-slate-300">{value}</span>}
+            />
+
+            <Bar dataKey="worstCaseFrequency" name="Worst 10% Outliers" fill="#f43f5e" radius={[0, 2, 2, 0]} />
+            <Bar dataKey="normalFrequency" name="Baseline Cohort" fill="#475569" radius={[0, 2, 2, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

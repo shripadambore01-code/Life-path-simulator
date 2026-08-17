@@ -5,26 +5,16 @@ export default function RiskBreakdown({ data }) {
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
-      const worst = payload.find(p => p.dataKey === 'worstCaseFrequency')?.value || 0;
-      const normal = payload.find(p => p.dataKey === 'normalFrequency')?.value || 0;
-      const delta = (worst - normal) * 100;
-
       return (
-        <div className="bg-slate-900/95 border border-slate-700/80 p-3 rounded-xl shadow-2xl text-xs font-mono backdrop-blur-md max-w-xs">
-          <p className="font-bold text-white mb-2 border-b border-slate-800 pb-1">{label}</p>
-          <div className="space-y-1.5">
-            <div className="flex justify-between items-center text-rose-400">
-              <span>Worst 10% Tail Runs:</span>
-              <span className="font-bold">{formatPercent(worst)}</span>
-            </div>
-            <div className="flex justify-between items-center text-slate-400">
-              <span>Baseline Cohort (Top 50%):</span>
-              <span>{formatPercent(normal)}</span>
-            </div>
-            <div className="pt-1.5 border-t border-slate-800/80 flex justify-between text-[11px] text-slate-300">
-              <span>Downside Sensitivity:</span>
-              <span className="font-semibold text-yellow-400">+{delta.toFixed(1)}% elevated</span>
-            </div>
+        <div className="bg-ink-950 text-white p-3 rounded border border-ink-800 shadow-lg text-xs font-mono tabular-nums space-y-1.5 min-w-[200px]">
+          <p className="font-semibold text-white border-b border-ink-800 pb-1">{label}</p>
+          <div className="flex justify-between gap-4 text-crimson-300">
+            <span>Tail Risk (Bottom 10%):</span>
+            <span className="font-bold">{formatPercent(payload[0].value)}</span>
+          </div>
+          <div className="flex justify-between gap-4 text-ink-300">
+            <span>Baseline Population:</span>
+            <span>{formatPercent(payload[1].value)}</span>
           </div>
         </div>
       );
@@ -33,51 +23,53 @@ export default function RiskBreakdown({ data }) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-        <div>
-          <h3 className="text-sm font-mono font-bold uppercase tracking-wider text-slate-200">
-            Downside Sensitivity Decomposition
-          </h3>
-          <p className="text-xs text-slate-400">
-            Event incidence in 10th percentile worst outcomes vs baseline
-          </p>
-        </div>
+    <div className="p-6 sm:p-7 space-y-4">
+      <div className="border-b border-[#f0ede6] pb-4">
+        <h3 className="text-base font-serif font-normal text-ink-950">
+          Tail Risk Attribution Matrix
+        </h3>
+        <p className="text-xs text-ink-500 font-mono mt-0.5">
+          Event incidence in worst 10% outcomes vs overall population average
+        </p>
       </div>
 
-      <div className="h-72 w-full">
+      <div className="h-72 w-full pt-1">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data}
+          <BarChart 
+            data={data} 
             layout="vertical"
-            margin={{ top: 10, right: 20, left: 40, bottom: 10 }}
+            margin={{ top: 5, right: 15, left: 20, bottom: 5 }}
             barGap={3}
           >
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#1e293b" />
-            <XAxis
-              type="number"
+            <CartesianGrid strokeDasharray="2 2" horizontal={false} stroke="#e7e5e4" />
+            <XAxis 
+              type="number" 
               tickFormatter={(val) => `${(val * 100).toFixed(0)}%`}
-              stroke="#475569"
-              tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'JetBrains Mono' }}
+              stroke="#a8a29e"
+              tick={{ fill: '#78716c', fontSize: 10, fontFamily: 'JetBrains Mono' }}
               domain={[0, 1]}
             />
-            <YAxis
-              type="category"
+            <YAxis 
+              type="category" 
               dataKey="factor"
-              stroke="#475569"
-              tick={{ fill: '#cbd5e1', fontSize: 11, fontFamily: 'JetBrains Mono' }}
+              stroke="#a8a29e"
+              tick={{ fill: '#27272a', fontSize: 11, fontFamily: 'Inter' }}
               width={120}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
-            <Legend
-              wrapperStyle={{ fontSize: '11px', fontFamily: 'JetBrains Mono', paddingTop: '10px' }}
-              formatter={(value) => <span className="text-slate-300">{value}</span>}
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f4f1ea' }} />
+            <Legend 
+              wrapperStyle={{ fontSize: '11px', fontFamily: 'JetBrains Mono', paddingTop: '10px' }} 
+              formatter={(value) => <span className="text-ink-600">{value}</span>}
             />
-
-            <Bar dataKey="worstCaseFrequency" name="Worst 10% Outliers" fill="#f43f5e" radius={[0, 2, 2, 0]} />
-            <Bar dataKey="normalFrequency" name="Baseline Cohort" fill="#475569" radius={[0, 2, 2, 0]} />
+            
+            <Bar dataKey="worstCaseFrequency" name="Downside Tail (Bottom 10%)" fill="#b91c1c" radius={[0, 2, 2, 0]} />
+            <Bar dataKey="normalFrequency" name="Expected Baseline" fill="#a1a1aa" radius={[0, 2, 2, 0]} />
           </BarChart>
         </ResponsiveContainer>
+      </div>
+
+      <div className="text-[11px] font-mono text-ink-500 pt-2 border-t border-[#f0ede6] leading-relaxed">
+        Key insight: Discrepancy highlights the primary catalyst triggering capital drawdown.
       </div>
     </div>
   );

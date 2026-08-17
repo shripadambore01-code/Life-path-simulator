@@ -5,7 +5,7 @@ import LoadingState from './components/LoadingState';
 import ResultsDashboard from './components/ResultsDashboard';
 
 function App() {
-  const [appState, setAppState] = useState('idle');
+  const [appState, setAppState] = useState('idle'); // idle, analyzing, reviewing, simulating, results, error
   const [userInput, setUserInput] = useState(null);
   const [simulationParams, setSimulationParams] = useState(null);
   const [scenarioInfo, setScenarioInfo] = useState(null);
@@ -36,7 +36,7 @@ function App() {
       });
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || 'Analysis failed');
+        throw new Error(errData.error || 'Parameter synthesis failed');
       }
       const data = await response.json();
       setSimulationParams(data.params);
@@ -67,13 +67,13 @@ function App() {
       });
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || 'Simulation failed');
+        throw new Error(errData.error || 'Simulation engine failed');
       }
       const data = await response.json();
       setResults(data);
       setAppState('results');
 
-      // Kick off strategic synthesis in background
+      // Kick off AI qualitative briefing in background
       fetch('/api/explain', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -92,8 +92,8 @@ function App() {
         .then(res => res.json())
         .then(data => setExplanation(data.explanation))
         .catch(err => {
-          console.error('Explanation fetch failed:', err);
-          setExplanation('Advisory synthesis generation was unavailable for this session. The computed stochastic outcomes above are fully validated.');
+          console.error('Explanation synthesis failed:', err);
+          setExplanation('Qualitative briefing could not be generated. All empirical numerical outputs and distributions above remain fully verified.');
         });
 
     } catch (err) {
@@ -117,75 +117,75 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 font-sans flex flex-col justify-between">
-      {/* Top Institutional Header */}
-      <header className="bg-slate-900/90 border-b border-slate-800/90 sticky top-0 z-30 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+    <div className="min-h-screen bg-paper-100 font-sans text-ink-900 selection:bg-paper-300">
+      {/* Institutional Top Navbar */}
+      <header className="bg-white border-b border-[#e5e2da] sticky top-0 z-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-mono font-bold text-white text-sm shadow-md shadow-blue-600/30">
+            <div className="w-7 h-7 bg-ink-950 rounded flex items-center justify-center text-white font-serif font-bold text-sm tracking-tight shadow-xs">
               LP
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-base font-display font-bold tracking-tight text-white">
-                  LifePath
-                </h1>
-                <span className="text-[10px] font-mono uppercase bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">
-                  Stochastic Model
+                <span className="font-serif font-semibold tracking-tight text-ink-950 text-base">
+                  LifePath Simulator
+                </span>
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.2 bg-paper-200 text-ink-600 rounded">
+                  v1.0 Stochastic
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 font-mono hidden sm:block">
-                Quantitative Life Decision Simulator · 10,000 Iterations
-              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {appState !== 'idle' && (
               <button
                 onClick={resetToIdle}
-                className="text-xs font-mono text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 cursor-pointer"
+                className="text-xs font-mono text-ink-600 hover:text-ink-950 transition-colors cursor-pointer"
               >
-                <span>↺</span>
-                <span>Reset / New Scenario</span>
+                ← Restart Dossier
               </button>
             )}
+            <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-mono text-ink-400 border-l border-[#e5e2da] pl-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+              <span>10k Path Engine Active</span>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 flex-1">
+      {/* Main Body */}
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         {appState === 'idle' && (
           <InputForm onSubmit={handleAnalyze} />
         )}
 
         {appState === 'analyzing' && (
-          <LoadingState
-            title="Calibrating Stochastic Parameters..."
-            subtitle="Synthesizing regional cost indices, tax implications, and labor market volatility from scenario"
+          <LoadingState 
+            title="Extracting Parameters & Econometric Bounds" 
+            subtitle="Translating narrative context into structured stochastic variables and cost-of-living assumptions."
           />
         )}
 
         {appState === 'reviewing' && (
-          <ParameterReview
-            params={simulationParams}
+          <ParameterReview 
+            params={simulationParams} 
             scenarioInfo={scenarioInfo}
-            onSimulate={handleSimulate}
-            onBack={resetToIdle}
+            onSimulate={handleSimulate} 
+            onBack={resetToIdle} 
           />
         )}
 
         {appState === 'simulating' && (
-          <LoadingState
-            title="Executing 10,000 Timelines..."
-            subtitle="Sampling probability distributions for income volatility, inflation drift, and correlated downside shocks"
+          <LoadingState 
+            title="Sampling 10,000 Stochastic Future Timelines" 
+            subtitle="Iterating multi-factor Box-Muller random walks, correlated employment shocks, and inflation dynamics."
           />
         )}
 
         {appState === 'results' && results && (
-          <ResultsDashboard
-            results={results}
+          <ResultsDashboard 
+            results={results} 
             explanation={explanation}
             horizon={horizon}
             onReset={resetToIdle}
@@ -194,29 +194,27 @@ function App() {
         )}
 
         {appState === 'error' && (
-          <div className="max-w-lg mx-auto mt-12">
-            <div className="fintech-card rounded-2xl p-8 border border-rose-800/60 text-center space-y-4">
-              <div className="w-12 h-12 mx-auto rounded-full bg-rose-950/80 border border-rose-800/60 flex items-center justify-center text-rose-400 text-xl font-mono">
-                !
-              </div>
-              <h2 className="text-xl font-bold text-white">Execution Error</h2>
-              <p className="text-xs font-mono text-rose-300 leading-relaxed">{error}</p>
-              <button
-                onClick={resetToIdle}
-                className="px-6 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-mono uppercase tracking-wider font-semibold border border-slate-700 transition"
-              >
-                Return to Form
-              </button>
+          <div className="max-w-md mx-auto my-12 bg-white p-8 rounded-lg border border-crimson-200 text-center space-y-4 shadow-xs">
+            <div className="w-10 h-10 mx-auto rounded-full bg-crimson-50 text-crimson-600 flex items-center justify-center font-mono font-bold text-sm">
+              !
             </div>
+            <h2 className="text-xl font-serif text-ink-950">Simulation Interrupted</h2>
+            <p className="text-xs text-ink-600 font-sans leading-relaxed">{error}</p>
+            <button 
+              onClick={resetToIdle}
+              className="inline-flex items-center justify-center px-5 py-2 text-xs font-mono uppercase tracking-wider bg-ink-950 text-white rounded hover:bg-ink-800 transition-colors cursor-pointer"
+            >
+              Return to Intake
+            </button>
           </div>
         )}
       </main>
 
-      {/* Institutional Footer */}
-      <footer className="border-t border-slate-800/80 bg-[#070a12] py-4 text-center text-xs font-mono text-slate-300">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>LifePath Simulator · Pure Math Monte Carlo Simulation with Correlated Stochastics</span>
-          <span className="text-slate-300">Analytical Demonstration · Not Investment Advice</span>
+      {/* Institutional Editorial Footer */}
+      <footer className="border-t border-[#e5e2da] bg-white py-6 mt-16 text-center">
+        <div className="max-w-5xl mx-auto px-4 text-[11px] font-mono text-ink-500 space-y-1">
+          <p>LifePath Simulator • Correlated Bayesian Monte Carlo Modeling • Powered by Google Gemini</p>
+          <p className="text-ink-400">For scenario evaluation and risk modeling purposes only.</p>
         </div>
       </footer>
     </div>

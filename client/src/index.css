@@ -1,62 +1,67 @@
 @import "tailwindcss";
 
 @theme {
-  --color-slate-850: #0f172a;
-  --color-slate-900: #0b0f19;
-  --color-slate-950: #05070d;
+  --color-ink-950: #09090b;
+  --color-ink-900: #18181b;
+  --color-ink-800: #27272a;
+  --color-ink-700: #3f3f46;
+  --color-ink-600: #52525b;
+  --color-ink-500: #71717a;
+  --color-ink-400: #a1a1aa;
+  --color-ink-300: #d4d4d8;
+  --color-ink-200: #e4e4e7;
+  --color-ink-100: #f4f4f5;
+  --color-ink-50: #fafafa;
 
-  --color-brand-50: #f0f7ff;
-  --color-brand-100: #e0effe;
-  --color-brand-500: #2563eb;
-  --color-brand-600: #1d4ed8;
-  --color-brand-700: #1e40af;
+  --color-paper-50: #fcfbf9;
+  --color-paper-100: #faf9f6;
+  --color-paper-200: #f4f1ea;
+  --color-paper-300: #eae5dc;
+  --color-paper-400: #d6cfc2;
 
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-emerald-700: #047857;
+  --color-emerald-600: #059669;
+  --color-emerald-500: #10b981;
+  --color-emerald-50: #ecfdf5;
+
+  --color-crimson-700: #991b1b;
+  --color-crimson-600: #dc2626;
+  --color-crimson-500: #ef4444;
+  --color-crimson-50: #fef2f2;
+
+  --color-amber-700: #b45309;
+  --color-amber-600: #d97706;
+  --color-amber-50: #fffbeb;
+
+  --font-serif: 'Newsreader', 'Instrument Serif', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
-/* Base Financial Styling */
-body {
-  background-color: #0b0f19;
-  color: #f1f5f9;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-}
-
-/* Numeric alignment for financial data */
+/* Institutional Tabular Numbers */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-/* Custom crisp scrollbar */
+/* Subtle editorial borders */
+.border-fine {
+  border-width: 1px;
+  border-color: #e5e2da;
+}
+
+/* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0f19;
+  background: #f4f1ea;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 3px;
+  background: #d6cfc2;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-
-/* Subtle card borders */
-.fintech-card {
-  background: #111827;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
-}
-
-.fintech-card-subtle {
-  background: #0f172a;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* Custom tooltip animations */
-.tooltip-shadow {
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  background: #a8a29e;
 }

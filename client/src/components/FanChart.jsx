@@ -12,57 +12,41 @@ export default function FanChart({ data }) {
 
   const formatMoney = (val) => {
     if (val == null || isNaN(val)) return '$0';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0
-    }).format(val);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
   };
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const point = payload[0].payload;
-      const startNW = chartData[0]?.p50 || 0;
-      const medianGrowth = point.p50 - startNW;
-      const year = (point.month / 12).toFixed(1);
-
+      const year = Math.floor(label / 12);
+      const month = label % 12;
       return (
-        <div className="bg-slate-900/95 border border-slate-700/80 p-4 rounded-xl shadow-2xl text-xs font-mono backdrop-blur-md min-w-[240px]">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
-            <span className="font-bold text-white uppercase tracking-wider">
-              Month {label} ({year} Yrs)
-            </span>
-            <span className="text-[10px] text-slate-400">10k Runs</span>
+        <div className="bg-ink-950 text-white p-3.5 rounded border border-ink-800 shadow-lg text-xs font-mono tabular-nums space-y-2 min-w-[220px]">
+          <div className="flex justify-between items-center border-b border-ink-800 pb-1.5 text-ink-300">
+            <span>Month {label} {year > 0 ? `(Yr ${year}, M${month})` : ''}</span>
+            <span className="text-[10px] uppercase text-ink-400">Percentiles</span>
           </div>
-
-          <div className="space-y-1.5 tabular-nums">
-            <div className="flex justify-between items-center text-slate-400">
-              <span>90th %ile (Upside):</span>
-              <span className="text-emerald-400 font-semibold">{formatMoney(point.p90)}</span>
+          <div className="space-y-1">
+            <div className="flex justify-between text-ink-300">
+              <span className="text-ink-400">90th (Upside):</span>
+              <span className="font-semibold text-white">{formatMoney(point.p90)}</span>
             </div>
-            <div className="flex justify-between items-center text-slate-400">
-              <span>75th %ile:</span>
-              <span className="text-slate-300">{formatMoney(point.p75)}</span>
+            <div className="flex justify-between text-ink-300">
+              <span className="text-ink-400">75th Percentile:</span>
+              <span>{formatMoney(point.p75)}</span>
             </div>
-            <div className="flex justify-between items-center text-white bg-slate-800/80 px-1.5 py-0.5 rounded font-bold border border-slate-700/60">
-              <span>50th %ile (Median):</span>
-              <span className="text-blue-400">{formatMoney(point.p50)}</span>
+            <div className="flex justify-between text-white border-y border-ink-800/80 py-0.5 my-0.5 font-bold">
+              <span className="text-amber-400">50th (Median):</span>
+              <span className="text-amber-400">{formatMoney(point.p50)}</span>
             </div>
-            <div className="flex justify-between items-center text-slate-400">
-              <span>25th %ile:</span>
-              <span className="text-slate-300">{formatMoney(point.p25)}</span>
+            <div className="flex justify-between text-ink-300">
+              <span className="text-ink-400">25th Percentile:</span>
+              <span>{formatMoney(point.p25)}</span>
             </div>
-            <div className="flex justify-between items-center text-slate-400">
-              <span>10th %ile (Downside):</span>
-              <span className="text-rose-400 font-semibold">{formatMoney(point.p10)}</span>
+            <div className="flex justify-between text-ink-300">
+              <span className="text-ink-400">10th (Downside):</span>
+              <span className="text-crimson-400 font-semibold">{formatMoney(point.p10)}</span>
             </div>
-          </div>
-
-          <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex justify-between text-[10px] text-slate-400">
-            <span>Cumulative Median Delta:</span>
-            <span className={medianGrowth >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
-              {medianGrowth >= 0 ? '+' : ''}{formatMoney(medianGrowth)}
-            </span>
           </div>
         </div>
       );
@@ -71,70 +55,75 @@ export default function FanChart({ data }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="p-6 sm:p-7 space-y-4">
       {/* Chart Header & Legend */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-3 border-b border-[#f0ede6] pb-4">
         <div>
-          <h3 className="text-sm font-mono font-bold uppercase tracking-wider text-slate-200">
-            Net Worth Trajectory Dispersion (Fan Chart)
+          <h3 className="text-base font-serif font-normal text-ink-950">
+            Net Worth Dispersion Over Horizon
           </h3>
-          <p className="text-xs text-slate-400">
-            Monthly stochastic net worth bounds over simulation horizon
+          <p className="text-xs text-ink-500 font-mono mt-0.5">
+            10,000 monthly trajectory paths across 80% & 50% confidence intervals
           </p>
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center gap-3 text-[11px] font-mono flex-wrap">
+        {/* Financial Times style Legend */}
+        <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono text-ink-600">
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-0.5 bg-blue-500 inline-block"></span>
-            <span className="text-slate-300">Median (P50)</span>
+            <span className="w-3 h-3 rounded-xs bg-[#71717a]/20 border border-[#71717a]/40"></span>
+            <span>10th–90th (80% Range)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 bg-blue-500/30 rounded-xs inline-block"></span>
-            <span className="text-slate-400">25th–75th %ile</span>
+            <span className="w-3 h-3 rounded-xs bg-[#3f3f46]/35 border border-[#3f3f46]/60"></span>
+            <span>25th–75th (Interquartile)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 bg-blue-500/15 rounded-xs inline-block"></span>
-            <span className="text-slate-400">10th–90th %ile</span>
+            <span className="w-3.5 h-0.5 bg-ink-950"></span>
+            <span className="font-semibold text-ink-900">Median (50th)</span>
           </div>
         </div>
       </div>
 
       {/* Chart Container */}
-      <div className="h-80 w-full">
+      <div className="h-84 w-full pt-2">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
-            <XAxis
-              dataKey="month"
-              tickFormatter={(val) => val === 0 ? 'Month 0' : val % 12 === 0 ? `Yr ${val/12}` : ''}
-              stroke="#475569"
-              tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'JetBrains Mono' }}
+          <AreaChart data={chartData} margin={{ top: 10, right: 15, left: 10, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="2 2" vertical={false} stroke="#e7e5e4" />
+            <XAxis 
+              dataKey="month" 
+              tickFormatter={(val) => val === 0 ? 'Start' : val % 12 === 0 ? `Yr ${val/12}` : ''}
+              stroke="#a8a29e"
+              tick={{ fill: '#78716c', fontSize: 11, fontFamily: 'JetBrains Mono' }}
+              tickLine={{ stroke: '#d6d3d1' }}
             />
-            <YAxis
+            <YAxis 
               tickFormatter={(val) => {
                 if (Math.abs(val) >= 1000000) return `$${(val/1000000).toFixed(1)}M`;
                 if (Math.abs(val) >= 1000) return `$${(val/1000).toFixed(0)}k`;
                 return `$${val}`;
               }}
-              stroke="#475569"
-              tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'JetBrains Mono' }}
+              stroke="#a8a29e"
+              tick={{ fill: '#78716c', fontSize: 11, fontFamily: 'JetBrains Mono' }}
+              tickLine={{ stroke: '#d6d3d1' }}
               width={75}
             />
             <Tooltip content={<CustomTooltip />} />
-            <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="3 3" strokeOpacity={0.6} />
-
-            {/* Base offset to p10 */}
-            <Area type="monotone" dataKey="p10" stackId="1" stroke="none" fill="transparent" activeDot={false} />
-
-            {/* Quartile bands */}
-            <Area type="monotone" dataKey="band_10_25" stackId="1" stroke="none" fill="#3b82f6" fillOpacity={0.12} activeDot={false} />
-            <Area type="monotone" dataKey="band_25_50" stackId="1" stroke="none" fill="#3b82f6" fillOpacity={0.28} activeDot={false} />
-            <Area type="monotone" dataKey="band_50_75" stackId="1" stroke="none" fill="#3b82f6" fillOpacity={0.28} activeDot={false} />
-            <Area type="monotone" dataKey="band_75_90" stackId="1" stroke="none" fill="#3b82f6" fillOpacity={0.12} activeDot={false} />
-
-            {/* Median line on top */}
-            <Area type="monotone" dataKey="p50" stroke="#3b82f6" strokeWidth={2.5} fill="none" activeDot={{ r: 5, fill: '#60a5fa', stroke: '#1e3a8a', strokeWidth: 2 }} />
+            <ReferenceLine y={0} stroke="#dc2626" strokeDasharray="3 3" strokeWidth={1} label={{ value: '$0 Break-even', position: 'insideTopLeft', fill: '#dc2626', fontSize: 10, fontFamily: 'JetBrains Mono' }} />
+            
+            {/* Invisible bottom spacer to lift stack to p10 */}
+            <Area type="monotone" dataKey="p10" stackId="1" stroke="none" fill="transparent" activeDot={false} isAnimationActive={false} />
+            
+            {/* Outer confidence band: p10 -> p25 */}
+            <Area type="monotone" dataKey="band_10_25" stackId="1" stroke="none" fill="#71717a" fillOpacity={0.15} activeDot={false} isAnimationActive={false} />
+            {/* Inner interquartile band: p25 -> p50 */}
+            <Area type="monotone" dataKey="band_25_50" stackId="1" stroke="none" fill="#3f3f46" fillOpacity={0.35} activeDot={false} isAnimationActive={false} />
+            {/* Inner interquartile band: p50 -> p75 */}
+            <Area type="monotone" dataKey="band_50_75" stackId="1" stroke="none" fill="#3f3f46" fillOpacity={0.35} activeDot={false} isAnimationActive={false} />
+            {/* Outer confidence band: p75 -> p90 */}
+            <Area type="monotone" dataKey="band_75_90" stackId="1" stroke="none" fill="#71717a" fillOpacity={0.15} activeDot={false} isAnimationActive={false} />
+            
+            {/* Median line drawn distinctly on top */}
+            <Area type="monotone" dataKey="p50" stroke="#09090b" strokeWidth={2.25} fill="none" activeDot={{ r: 4, fill: '#09090b', stroke: '#fff', strokeWidth: 2 }} />
           </AreaChart>
         </ResponsiveContainer>
       </div>

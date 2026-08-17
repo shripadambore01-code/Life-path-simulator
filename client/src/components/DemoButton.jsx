@@ -1,14 +1,15 @@
-export default function DemoButton({ onDemo, onSelectScenario }) {
+export default function DemoButton({ onDemo }) {
   return (
-    <div className="flex items-center gap-2">
-      <button
-        type="button"
-        onClick={() => onDemo('austin')}
-        className="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 hover:border-slate-600 transition-all flex items-center gap-2 shadow-sm"
-      >
-        <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
-        Load Example: Austin Relocation ($75k → $95k)
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={onDemo}
+      className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-mono tracking-wide text-ink-700 bg-paper-100 hover:bg-paper-200 border border-paper-400/80 rounded-md transition-all cursor-pointer shadow-xs active:scale-[0.99]"
+      title="Populate with standard benchmark relocation scenario"
+    >
+      <svg className="w-3.5 h-3.5 text-ink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+      Load Benchmark Scenario
+    </button>
   );
 }

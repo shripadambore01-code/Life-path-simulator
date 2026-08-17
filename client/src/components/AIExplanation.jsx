@@ -1,54 +1,44 @@
 export default function AIExplanation({ explanation }) {
   return (
-    <div className="fintech-card rounded-xl p-6 sm:p-8 border border-slate-800 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+    <div className="bg-white border border-[#e5e2da] rounded-lg p-6 sm:p-8 shadow-xs space-y-6">
+      {/* Editorial Header */}
+      <div className="border-b border-[#f0ede6] pb-4 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
-            <span className="text-[11px] font-mono uppercase tracking-widest text-blue-400 font-semibold">
-              Executive Decision Briefing
-            </span>
-          </div>
-          <h3 className="text-lg sm:text-xl font-display font-bold text-white tracking-tight mt-0.5">
-            Qualitative Synthesis & Risk Advisory
+          <span className="text-[10px] font-mono uppercase tracking-widest text-ink-500 font-semibold block">
+            Qualitative Analysis
+          </span>
+          <h3 className="text-xl font-serif text-ink-950 font-normal tracking-tight mt-0.5">
+            Executive Briefing & Strategic Synthesis
           </h3>
         </div>
-
-        <div className="text-[10px] font-mono text-slate-400 bg-slate-900 px-2.5 py-1 rounded-md border border-slate-800 self-start sm:self-auto">
-          Stochastic Output Synthesis
+        <div className="text-[10px] font-mono text-ink-400 bg-paper-100 px-2.5 py-1 rounded border border-paper-300">
+          Source: Gemini Econometric Analysis
         </div>
       </div>
 
       {/* Body Content */}
       {!explanation ? (
-        <div className="space-y-3 py-2">
-          <div className="flex items-center gap-2 text-xs font-mono text-slate-400 mb-4">
-            <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <span>Generating structured strategic synthesis from 10,000 timeline iterations...</span>
-          </div>
-          <div className="h-4 bg-slate-800/80 rounded animate-pulse w-full"></div>
-          <div className="h-4 bg-slate-800/80 rounded animate-pulse w-5/6"></div>
-          <div className="h-4 bg-slate-800/80 rounded animate-pulse w-4/6"></div>
-          <div className="h-4 bg-slate-800/80 rounded animate-pulse w-full"></div>
+        <div className="space-y-3.5 py-2">
+          <div className="h-3.5 bg-paper-200 rounded animate-pulse w-full"></div>
+          <div className="h-3.5 bg-paper-200 rounded animate-pulse w-11/12"></div>
+          <div className="h-3.5 bg-paper-200 rounded animate-pulse w-4/5"></div>
+          <div className="h-3.5 bg-paper-200 rounded animate-pulse w-full pt-4"></div>
+          <div className="h-3.5 bg-paper-200 rounded animate-pulse w-9/12"></div>
         </div>
       ) : (
-        <div className="space-y-4 text-sm text-slate-300 leading-relaxed font-sans">
+        <div className="space-y-4 font-serif text-ink-800 text-[15px] sm:text-base leading-relaxed">
           {explanation.split('\n').filter(p => p.trim() !== '').map((paragraph, i) => (
-            <p key={i} className="leading-relaxed">
+            <p key={i} className="first-of-type:font-normal first-of-type:text-ink-900">
               {paragraph}
             </p>
           ))}
         </div>
       )}
 
-      {/* Audit Disclaimer */}
-      <div className="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-300 font-mono">
-        <div>
-          <span className="text-slate-300 font-semibold">Audit Notice: </span>
-          <span>Charts and metrics are computed via mathematical Monte Carlo simulation. This briefing synthesizes distribution drivers for qualitative evaluation.</span>
-        </div>
-        <span className="text-slate-300 shrink-0">Model: Stochastic Kernel</span>
+      {/* Provenance Footnote */}
+      <div className="pt-4 border-t border-[#f0ede6] flex flex-col sm:flex-row sm:items-center justify-between text-[11px] font-mono text-ink-400 gap-2">
+        <span>Quantitative outputs derived from Monte Carlo engine; qualitative context synthesized by LLM.</span>
+        <span className="shrink-0">LifePath Stochastic Model</span>
       </div>
     </div>
   );

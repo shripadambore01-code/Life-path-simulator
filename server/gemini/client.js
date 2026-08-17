@@ -1,4 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 let ai;
 function getClient() {
@@ -8,9 +14,31 @@ function getClient() {
     return ai;
 }
 
-export async function analyzeDecision(userInput, structuredFields) {
-    const client = getClient();
+// Fallback models in priority order
+const MODELS = ['gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite'];
 
+async function generateWithFallback(prompt) {
+    const client = getClient();
+    let lastError = null;
+
+    for (const model of MODELS) {
+        try {
+            const result = await client.models.generateContent({
+                model,
+                contents: prompt,
+            });
+            if (result && result.text) {
+                return result.text;
+            }
+        } catch (err) {
+            console.warn(`Model ${model} failed: ${err.message || err.status}. Trying fallback...`);
+            lastError = err;
+        }
+    }
+    throw lastError || new Error('All Gemini models failed to generate content');
+}
+
+export async function analyzeDecision(userInput, structuredFields) {
     const prompt = `You are a financial analyst. Analyze this user's decision and their current financial situation. Based on the details, estimate the parameters needed for a Monte Carlo financial simulation.
 
 USER'S DECISION: "${userInput}"
@@ -52,12 +80,9 @@ Return ONLY valid JSON (no markdown fences, no explanation text) with EXACTLY th
   "inferredAssumptions": ["<assumption 1>", "<assumption 2>", ...]
 }`;
 
-    const result = await client.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-    });
-
-    let text = result.text.trim();
+    const rawText = await generateWithFallback(prompt);
+    let text = rawText.trim();
+    
     // Strip markdown code fences if present
     if (text.startsWith('```json')) {
         text = text.slice(7);
@@ -72,22 +97,20 @@ Return ONLY valid JSON (no markdown fences, no explanation text) with EXACTLY th
 }
 
 export async function explainResults(summaryStats, riskContributions, percentiles, userContext) {
-    const client = getClient();
-
     const prompt = `You are a financial advisor explaining Monte Carlo simulation results to a non-technical person. Write a clear, empathetic, and actionable 3-4 paragraph explanation.
 
 SIMULATION RESULTS:
-- Median final net worth: $${summaryStats.median?.toFixed(0)}
-- Mean final net worth: $${summaryStats.mean?.toFixed(0)}
-- Standard deviation: $${summaryStats.stddev?.toFixed(0)}
-- Probability of negative net worth: ${summaryStats.negativeNetWorthPercent?.toFixed(1)}%
-- Probability of ending below starting savings: ${summaryStats.lessThanStartingPercent?.toFixed(1)}%
-- Starting net worth: $${summaryStats.startingNetWorth?.toFixed(0)}
-- 10th percentile (worst likely): $${percentiles?.p10?.toFixed(0)}
-- 25th percentile: $${percentiles?.p25?.toFixed(0)}
-- 50th percentile (median): $${percentiles?.p50?.toFixed(0)}
-- 75th percentile: $${percentiles?.p75?.toFixed(0)}
-- 90th percentile (best likely): $${percentiles?.p90?.toFixed(0)}
+- Median final net worth: $${summaryStats?.median ? Number(summaryStats.median).toFixed(0) : 'N/A'}
+- Mean final net worth: $${summaryStats?.mean ? Number(summaryStats.mean).toFixed(0) : 'N/A'}
+- Standard deviation: $${summaryStats?.stddev ? Number(summaryStats.stddev).toFixed(0) : 'N/A'}
+- Probability of negative net worth: ${summaryStats?.negativeNetWorthPercent ? Number(summaryStats.negativeNetWorthPercent).toFixed(1) : 0}%
+- Probability of ending below starting savings: ${summaryStats?.lessThanStartingPercent ? Number(summaryStats.lessThanStartingPercent).toFixed(1) : 0}%
+- Starting net worth: $${summaryStats?.startingNetWorth ? Number(summaryStats.startingNetWorth).toFixed(0) : 'N/A'}
+- 10th percentile (worst likely): $${percentiles?.p10 ? Number(percentiles.p10).toFixed(0) : 'N/A'}
+- 25th percentile: $${percentiles?.p25 ? Number(percentiles.p25).toFixed(0) : 'N/A'}
+- 50th percentile (median): $${percentiles?.p50 ? Number(percentiles.p50).toFixed(0) : 'N/A'}
+- 75th percentile: $${percentiles?.p75 ? Number(percentiles.p75).toFixed(0) : 'N/A'}
+- 90th percentile (best likely): $${percentiles?.p90 ? Number(percentiles.p90).toFixed(0) : 'N/A'}
 
 TOP RISK FACTORS:
 ${JSON.stringify(riskContributions, null, 2)}
@@ -103,10 +126,6 @@ Cover these points:
 
 Write in a warm, professional tone. Use dollar amounts. Do NOT use markdown formatting or headers — just clean paragraphs.`;
 
-    const result = await client.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-    });
-
-    return result.text;
+    const text = await generateWithFallback(prompt);
+    return text.trim();
 }

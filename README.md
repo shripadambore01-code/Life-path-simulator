@@ -1,202 +1,118 @@
 # LifePath Simulator
 
-> **Monte Carlo simulation meets AI** — Model thousands of possible financial outcomes for your major life decisions, instead of relying on a single guess.
+> **Quantitative Decision Modeling** — Empirical Monte Carlo simulation meets AI. Model thousands of correlated stochastic timelines for your major financial and life decisions.
 
-![Status](https://img.shields.io/badge/status-MVP-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-Production%20Ready-emerald)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Vercel](https://img.shields.io/badge/deploy-Vercel%20Ready-black)
 
 ---
 
 ## What is this?
 
-LifePath Simulator helps you make better life decisions (changing jobs, relocating, starting a business) by running **10,000 Monte Carlo simulations** to show the full range of possible financial outcomes — not just a single optimistic or pessimistic number.
+LifePath Simulator helps you weigh life-altering decisions (changing jobs, relocating cities, starting a business, taking loans) by projecting **10,000 Monte Carlo stochastic sample paths** to reveal the true distribution of financial outcomes — instead of relying on a static, single-point guess.
 
-**How it works:**
-1. **You describe your situation** in plain English + key financial details
-2. **Gemini AI** translates your description into structured simulation parameters (income, expenses, risk factors)
-3. **A real Monte Carlo engine** (pure math, not LLM guessing) runs 10,000 randomized timelines
-4. **Results dashboard** shows the distribution of outcomes, risk breakdown, and AI-explained insights
-
-### Key differentiator
-The simulation models **correlated risks** — for example, job loss increases the probability of stress-related unexpected expenses AND reduces re-employment income. This produces more realistic outcome distributions than naive models that treat risks as independent.
+**Architecture Workflow:**
+1. **Scenario Intake**: Describe your baseline situation and proposed decision in plain language.
+2. **Econometric Parameter Synthesis**: Google Gemini extracts and bounds structured parameters (state tax impacts, cost-of-living differentials, industry risk factors).
+3. **Pure Math Monte Carlo Engine**: Runs 10,000 randomized 60-month timelines using Box-Muller normal sampling, log-normal shock events, and correlated unemployment matrices.
+4. **Editorial Results Dashboard**: Visualizes the outcome distribution via Financial Times–style Fan Charts, probability density histograms, and risk attribution breakdowns.
+5. **Executive Strategic Briefing**: Generates qualitative analysis and risk mitigation recommendations without generic AI gimmicks.
 
 ---
 
-## Tech Stack
+## 🚀 One-Click Deployment
 
-| Component | Technology |
-|---|---|
-| Frontend | React 19 + Vite 6 |
-| Styling | Tailwind CSS v4 |
-| Charts | Recharts |
-| Backend | Node.js + Express |
-| Simulation | Custom Monte Carlo engine (pure JavaScript) |
-| AI | Google Gemini API (`gemini-2.5-flash`) via `@google/genai` |
-| Fonts | Inter + Plus Jakarta Sans |
+### Option A: Deploy to Vercel (Recommended)
+
+1. Fork or import this repository into your [Vercel Dashboard](https://vercel.com/new).
+2. Set the following **Environment Variable** in Vercel:
+   - `GEMINI_API_KEY`: Your Google Gemini API Key ([Get one here](https://aistudio.google.com/apikey))
+3. Click **Deploy**.
+   - *The included `vercel.json` and `api/index.js` automatically configure both the Vite frontend build and the serverless Express API.*
+
+### Option B: Deploy to Render / Railway / Fly.io
+
+1. Create a new **Web Service** pointing to your repository.
+2. Configure:
+   - **Build Command**: `npm run build`
+   - **Start Command**: `npm start`
+   - **Environment Variable**: `GEMINI_API_KEY=your_key_here`
+3. Click **Deploy**. Express will serve the built React app and all `/api/*` endpoints on a single unified port.
 
 ---
 
-## Quick Start
+## 💻 Local Development
 
 ### Prerequisites
-- Node.js 18+ (tested with v24)
-- A [Google Gemini API key](https://aistudio.google.com/apikey)
+- Node.js 18+ (tested on Node 20 / 22 / 24)
+- A [Google Gemini API Key](https://aistudio.google.com/apikey)
 
-### 1. Clone the repository
+### 1. Clone and Install
 ```bash
 git clone https://github.com/shripadambore01-code/Life-path-simulator.git
 cd Life-path-simulator
-```
-
-### 2. Set up the backend
-```bash
-cd server
 npm install
+npm run install:all
 ```
 
-Create a `.env` file in the `server/` directory:
+### 2. Configure Environment
+Create a `.env` file in the `server/` directory (or in root):
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
 PORT=3001
 ```
 
-Start the server:
+### 3. Run Locally
+
+**Option 1: Unified Production Mode**
 ```bash
-node index.js
-# Server running on port 3001
+npm run build
+npm start
+# App available at http://localhost:3001
 ```
 
-### 3. Set up the frontend
-Open a new terminal:
+**Option 2: Development Mode (Hot Reloading)**
 ```bash
-cd client
-npm install
-npm run dev
-# Vite dev server at http://localhost:5173
-```
+# Terminal 1: Backend API
+cd server && node index.js
 
-### 4. Open the app
-Navigate to **http://localhost:5173** in your browser.
+# Terminal 2: Frontend Vite
+cd client && npm run dev
+# Frontend live at http://localhost:5173 (proxies /api to 3001)
+```
 
 ---
 
-## Architecture
+## 📐 Monte Carlo Stochastic Model
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    React Frontend (Vite)                     │
-│  ┌──────────┐  ┌────────────────┐  ┌────────────────────┐  │
-│  │InputForm │→ │ParameterReview │→ │ ResultsDashboard    │  │
-│  │          │  │ (editable)     │  │ ├─ FanChart         │  │
-│  │ + Demo   │  │                │  │ ├─ Histogram        │  │
-│  │   Button │  │                │  │ ├─ RiskBreakdown    │  │
-│  └────┬─────┘  └───────┬────────┘  │ └─ AIExplanation    │  │
-│       │                │           └─────────┬────────────┘  │
-│───────│────────────────│─────────────────────│───────────────│
-        │ /api/analyze   │ /api/simulate       │ /api/explain
-        ▼                ▼                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  Express Backend (:3001)                      │
-│                                                              │
-│  ┌──────────────┐    ┌────────────────────┐                  │
-│  │ Gemini Client│    │ Monte Carlo Engine │ ← Pure math,     │
-│  │ (AI only)    │    │ ├─ distributions   │   no LLM calls   │
-│  │              │    │ ├─ engine          │                  │
-│  │              │    │ └─ statistics      │                  │
-│  └──────────────┘    └────────────────────┘                  │
-└─────────────────────────────────────────────────────────────┘
-```
+### Mathematical Variables & Distributions
 
-### Clear separation of concerns
-- **Gemini AI** is used ONLY for: (1) translating natural language → simulation parameters, and (2) explaining results in plain English
-- **Monte Carlo engine** is pure math — Box-Muller normal sampling, log-normal distributions, Bernoulli trials. Zero LLM involvement.
-
----
-
-## Monte Carlo Model
-
-### Simulated Variables
-
-| Variable | Distribution | Default |
+| Variable | Distribution | Default Parameterization |
 |---|---|---|
-| Annual raises | Normal(μ=3%, σ=2%) | Clamped -5% to +20% |
-| Job loss | Bernoulli(p=0.3%/month) | ~3.5% annual |
-| Unemployment duration | Normal(μ=3mo, σ=2mo) | Clamped 1-24 months |
-| Rent/expense increases | Normal(μ=4%, σ=2%) | Annual |
-| Unexpected expenses | Log-normal(median=$2000) | 2% monthly chance |
-| Inflation | Normal(μ=0.25%/mo, σ=0.1%/mo) | ~3% annual |
+| Annual Career Raises | $\mathcal{N}(\mu=3\%, \sigma=2\%)$ | Clamped between $-5\%$ and $+20\%$ |
+| Involuntary Job Loss | $\text{Bernoulli}(p=0.3\%/\text{mo})$ | $\approx 3.5\%$ annual probability |
+| Unemployment Duration | $\text{LogNormal}(\mu=3\text{mo}, \sigma=2\text{mo})$ | Clamped 1 to 24 months |
+| Expense / Rent Escalation | $\mathcal{N}(\mu=4\%, \sigma=2\%)$ | Annual adjustment |
+| Tail Shock Expenses | $\text{LogNormal}(\text{median}=\$2,000, \sigma=1.0)$ | Low-probability, high-impact ($500–$15,000) |
+| Inflation Drift | $\mathcal{N}(\mu=0.25\%/\text{mo}, \sigma=0.1\%/\text{mo})$ | $\approx 3.0\%$ annualized inflation |
 
-### Correlated Risks
-- **Job loss → savings drawdown**: No income contribution during unemployment
-- **Job loss → higher shock probability**: 2.5× increase in unexpected expense probability during unemployment
-- **Job loss → pay cut risk**: 15% chance of accepting 10-20% lower salary on re-employment
-- **Economic cycles**: Hidden quarterly economic state (good/neutral/bad) that affects job loss probability and raise rates simultaneously
-
----
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/health` | Health check |
-| POST | `/api/analyze` | Gemini-powered parameter extraction from natural language |
-| POST | `/api/simulate` | Run Monte Carlo simulation (pure math) |
-| POST | `/api/explain` | Gemini-powered plain-English results explanation |
+### Correlated Stress Factors
+- **Job Loss ➔ Reserves Depletion**: Monthly expenses draw down liquid savings directly with partial UI replacement.
+- **Job Loss ➔ Shock Multiplier**: Shock event probability increases by $2.5\times$ during unemployment (deferred maintenance, stress health costs).
+- **Job Loss ➔ Re-employment Pay Cut**: $15\%$ probability of accepting a $10–20\%$ lower compensation upon market re-entry.
+- **Macroeconomic Regime Shifts**: Hidden quarterly economic state transitions (Expansion / Neutral / Contraction) modulating raise rates and layoff hazards in unison.
 
 ---
 
-## Demo Scenario
+## 🏛️ Hallmark Editorial Design System
 
-Click **"Try a Demo"** to load a pre-filled scenario:
-> *"I'm considering moving from Chicago to Austin, TX for a software engineering position paying $95,000, up from my current $75,000. My current rent is $1,400/month. I've heard Austin has gotten expensive but there's no state income tax."*
-
----
-
-## Project Structure
-
-```
-├── client/                     # React + Vite frontend
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── InputForm.jsx           # Decision input form
-│   │   │   ├── ParameterReview.jsx     # Review/edit AI-inferred params
-│   │   │   ├── ResultsDashboard.jsx    # Main results container
-│   │   │   ├── FanChart.jsx            # Trajectory spread chart
-│   │   │   ├── HistogramChart.jsx      # Outcome distribution
-│   │   │   ├── RiskBreakdown.jsx       # Risk factor analysis
-│   │   │   ├── AIExplanation.jsx       # Gemini-generated insights
-│   │   │   ├── LoadingState.jsx        # Loading animations
-│   │   │   └── DemoButton.jsx          # Pre-filled example
-│   │   ├── App.jsx                     # State machine & routing
-│   │   ├── main.jsx                    # Entry point
-│   │   └── index.css                   # Tailwind v4 theme
-│   ├── index.html
-│   ├── vite.config.js
-│   └── package.json
-├── server/                     # Express backend
-│   ├── simulation/
-│   │   ├── engine.js                   # Monte Carlo core (pure math)
-│   │   ├── distributions.js            # Probability distributions
-│   │   └── statistics.js               # Percentile/summary computation
-│   ├── gemini/
-│   │   └── client.js                   # Gemini API wrapper
-│   ├── routes/
-│   │   ├── simulate.js                 # Simulation endpoint
-│   │   ├── analyze.js                  # AI analysis endpoint
-│   │   └── explain.js                  # AI explanation endpoint
-│   ├── index.js                        # Express entry point
-│   ├── .env                            # API key (not committed)
-│   └── package.json
-├── .gitignore
-└── README.md
-```
+- **Typography**: Editorial serif (*Newsreader*, *Instrument Serif*) paired with tabular monospaced figures (*JetBrains Mono*) and high-legibility sans (*Inter*).
+- **Palette**: Natural warm paper (`#faf9f6` / `#f4f1ea`), deep ink black (`#09090b`), British racing green (`#047857`), and oxide crimson (`#b91c1c`).
+- **Visualizations**: Financial Times–style stacked confidence interval fan charts, outcome density histograms, and risk factor attribution matrices.
 
 ---
 
-## License
+## 📄 License
 
-MIT
-
----
-
-*Built for hackathon demo purposes. Not financial advice.*
+MIT © [Shripad Ambore](https://github.com/shripadambore01-code)
